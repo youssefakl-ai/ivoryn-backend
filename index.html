@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STREET BRAND | SHOP</title>
+    <style>
+        body { background: #000; color: #fff; font-family: 'Helvetica', sans-serif; margin: 0; padding: 20px; text-align: center; }
+        .shop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; max-width: 1100px; margin: auto; }
+        .product-card { border: 1px solid #222; padding: 15px; background: #0a0a0a; }
+        .img-placeholder { width: 100%; height: 300px; background: #1a1a1a; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; }
+        .price { color: #00ff00; font-size: 1.2rem; display: block; margin: 10px 0; }
+        .order-btn { background: #fff; color: #000; border: none; padding: 12px; width: 100%; font-weight: bold; cursor: pointer; }
+
+        /* MODAL POPUP */
+        #order-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
+        .form-content { background: #111; padding: 30px; max-width: 400px; margin: 100px auto; border: 1px solid #333; text-align: left; }
+        label { font-size: 12px; color: #888; text-transform: uppercase; }
+        input, select { width: 100%; padding: 10px; margin: 5px 0 20px 0; background: #000; border: 1px solid #444; color: #fff; }
+    </style>
+</head>
+<body>
+
+    <h1>STREET BRAND EGY</h1>
+
+    <div class="shop-grid">
+        <div class="product-card">
+            <div class="img-placeholder">IMAGE 1</div>
+            <h3>Oversized Tee</h3>
+            <span class="price">450 EGP</span>
+            <button class="order-btn" onclick="openOrder('Oversized Tee', '450 EGP')">Buy Now</button>
+        </div>
+        <div class="product-card">
+            <div class="img-placeholder">IMAGE 2</div>
+            <h3>Graphic Hoodie</h3>
+            <span class="price">850 EGP</span>
+            <button class="order-btn" onclick="openOrder('Graphic Hoodie', '850 EGP')">Buy Now</button>
+        </div>
+    </div>
+
+    <div id="order-modal">
+        <div class="form-content">
+            <h2 id="selected-item" style="margin-top:0;">Product Name</h2>
+            
+            <label>Your Name</label>
+            <input type="text" id="cust-name">
+
+            <label>Phone Number</label>
+            <input type="text" id="cust-phone">
+
+            <label>Address</label>
+            <input type="text" id="cust-address">
+
+            <label>Payment Method</label>
+            <select id="payment-method">
+                <option value="Cash on Delivery">Cash on Delivery (COD)</option>
+                <option value="Vodafone Cash">Vodafone Cash</option>
+            </select>
+
+            <button class="order-btn" style="background: #00ff00;" onclick="submitFinalOrder()">CONFIRM ORDER</button>
+            <button onclick="document.getElementById('order-modal').style.display='none'" style="background:none; color:red; border:none; width:100%; margin-top:10px; cursor:pointer;">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        let currentItem = "";
+        let currentPrice = "";
+
+        function openOrder(name, price) {
+            currentItem = name;
+            currentPrice = price;
+            document.getElementById('selected-item').innerText = name + " - " + price;
+            document.getElementById('order-modal').style.display = 'block';
+        }
+
+        async function submitFinalOrder() {
+            const orderData = {
+                name: document.getElementById('cust-name').value,
+                phone: document.getElementById('cust-phone').value,
+                item: currentItem,
+                price: currentPrice,
+                address: document.getElementById('cust-address').value,
+                payment: document.getElementById('payment-method').value
+            };
+
+            const response = await fetch('http://localhost:3000/order', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(orderData)
+            });
+
+            if(response.ok) {
+                alert('Order received! You chose ' + orderData.payment);
+                document.getElementById('order-modal').style.display = 'none';
+            } else {
+                alert('Server Error!');
+            }
+        }
+    </script>
+</body>
+</html>
